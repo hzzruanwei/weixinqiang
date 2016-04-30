@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" ng-app=Wx client>
+<head>
+  <meta charset="UTF-8">
+  <title>Wx client</title>
+  <style>
+    li > img{
+      width: 32px;
+    }
+  </style>
+</head>
+<body style="padding: 10px;"ng-controller="TaskCtrl">
+<h3 ng-model="task" type="text" ></h3>
+<h4>消息列表</h4>
+<ul class="list-group">
+    <li ng-repeat="item in tasks track by $index" class="list-group-item">{{item}}
+    <a  ng-click="tasks.splice($index,1)">删除</a></li>
+
+</ul>
+</body>
+<script src="js/angular.min.js"></script>
+<script type="text/javascript">
+  var msglist = document.getElementById('messages');
+  var ws = new WebSocket('ws://123.206.56.120:9902/');
+  ws.onmessage = function(evt)
+  {
+    console.log(evt.data)
+    var msg = JSON.parse(evt.data);
+    var content = msg.xml.Content[0];
+    msg.user = msg.user || {};
+    var userName = msg.user.nickname;
+    var headimg = msg.user.headimgurl;
+
+    var oLi = document.createElement('li');
+    oLi.innerHTML = userName + '<img src="'+headimg+'">' + '说:' + content;
+    msglist.appendChild(oLi);	
+	  angular.module('Wx client',[]).controller('TaskCtrl',function($scope){
+        $scope.task=oLi.innerHTML ;
+        $scope.tasks=[];
+        $scope.add=function(){
+            $scope.tasks.push($scope.task);
+    }
+    })
+  };
+</script>
+</html>
